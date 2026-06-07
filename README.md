@@ -107,5 +107,5 @@ python manage.py test
 
 ## Author
 
-**Djafarou Abdou** — Computer Engineering Student, ENSEA Abidjan
+**Djafarou Abdou** — Computer Engineering Student, IUA
 EOF
