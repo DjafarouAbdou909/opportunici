@@ -23,3 +23,17 @@ media/
 # OS
 .DS_Store
 Thumbs.db
+
+module.exports = {
+  content: [
+    "../templates/**/*.html",
+    "../static/**/*.js",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+# Node
+frontend/node_modules/
+node_modules/
