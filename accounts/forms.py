@@ -1,53 +1,42 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .forms import SignupForm, LoginForm
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import User
 
 
-def signup_view(request):
-    """Vue d'inscription."""
-    if request.user.is_authenticated:
-        return redirect('profiles:dashboard')
-    
-    if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, f'Bienvenue {user.first_name} ! Ton compte est créé.')
-            return redirect('profiles:dashboard')
-        else:
-            messages.error(request, 'Vérifie les informations saisies.')
-    else:
-        form = SignupForm()
-    
-    return render(request, 'accounts/signup.html', {'form': form})
+class SignupForm(UserCreationForm):
+    first_name = forms.CharField(
+        max_length=50,
+        label='Prénom',
+        widget=forms.TextInput(attrs={'placeholder': 'Ton prénom'})
+    )
+    last_name = forms.CharField(
+        max_length=50,
+        label='Nom',
+        widget=forms.TextInput(attrs={'placeholder': 'Ton nom'})
+    )
+    email = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'placeholder': 'ton@email.com'})
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.cleaned_data['email']
+        if commit:
+            user.save()
+        return user
 
 
-def login_view(request):
-    """Vue de connexion."""
-    if request.user.is_authenticated:
-        return redirect('profiles:dashboard')
-    
-    if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            messages.success(request, f'Bon retour {user.first_name} !')
-            return redirect('profiles:dashboard')
-        else:
-            messages.error(request, 'Email ou mot de passe incorrect.')
-    else:
-        form = LoginForm()
-    
-    return render(request, 'accounts/login.html', {'form': form})
-
-
-@login_required
-def logout_view(request):
-    """Vue de déconnexion."""
-    logout(request)
-    messages.info(request, 'Tu es déconnecté.')
-    return redirect('accounts:login')
+class LoginForm(AuthenticationForm):
+    username = forms.EmailField(
+        label='Email',
+        widget=forms.EmailInput(attrs={'placeholder': 'ton@email.com'})
+    )
+    password = forms.CharField(
+        label='Mot de passe',
+        widget=forms.PasswordInput(attrs={'placeholder': '••••••••'})
+    )
