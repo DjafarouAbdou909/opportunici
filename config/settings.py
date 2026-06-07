@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'profiles',
     'opportunities',
     'matching',
+    'core',
 ]
 
 MIDDLEWARE = [
