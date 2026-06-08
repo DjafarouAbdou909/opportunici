@@ -1,7 +1,7 @@
 module.exports = {
   content: [
-    "../templates/**/*.html",
-    "../static/**/*.js",
+    "/home/djafarou-abdou/opportunici/templates/**/*.html",
+    "/home/djafarou-abdou/opportunici/static/**/*.js",
   ],
   theme: {
     extend: {},
