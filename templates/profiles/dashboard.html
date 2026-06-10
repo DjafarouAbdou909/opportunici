@@ -1,7 +1,166 @@
 {% extends 'base.html' %}
+
 {% block title %}Dashboard — OpportuniCI{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-    <p class="text-gray-500">Dashboard — en construction</p>
+
+<!-- NAVBAR -->
+<nav class="bg-white border-b border-gray-100 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <a href="/" class="text-xl font-bold text-gray-900">
+            Opportuni<span class="text-[#2D6A4F]">CI</span>
+        </a>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-gray-600">{{ request.user.full_name }}</span>
+            <a href="{% url 'accounts:logout' %}"
+               class="text-sm text-gray-500 hover:text-gray-900">
+                Déconnexion
+            </a>
+        </div>
+    </div>
+</nav>
+
+{% if not profil %}
+<div class="max-w-2xl mx-auto px-6 py-20 text-center">
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-16">
+        <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-[#2D6A4F]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-3">Commence par uploader ton CV</h2>
+        <p class="text-gray-500 text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+            Notre IA analyse ton CV en moins de 30 secondes et génère automatiquement ton profil professionnel complet.
+        </p>
+        <a href="{% url 'profiles:upload_cv' %}"
+           class="inline-block bg-[#2D6A4F] text-white font-medium px-8 py-3 rounded-xl hover:bg-[#245A42] transition text-sm">
+            Uploader mon CV
+        </a>
+        <p class="text-xs text-gray-400 mt-4">Gratuit · Confidentiel · PDF uniquement</p>
+    </div>
 </div>
+{% endif %}
+    {% else %}
+    <!-- PROFIL EXISTANT -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Colonne gauche — Profil -->
+        <div class="md:col-span-1 space-y-6">
+
+            <!-- Card Profil -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-[#2D6A4F] flex items-center justify-center text-white font-bold text-lg">
+                        {{ request.user.first_name|first }}{{ request.user.last_name|first }}
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900">{{ request.user.full_name }}</p>
+                        <p class="text-xs text-gray-500">{{ profil.titre_professionnel }}</p>
+                    </div>
+                </div>
+                {% if profil.localisation %}
+                <p class="text-xs text-gray-500 mb-4">📍 {{ profil.localisation }}</p>
+                {% endif %}
+                <a href="{% url 'profiles:upload_cv' %}"
+                   class="text-xs text-[#2D6A4F] font-medium hover:underline">
+                    Mettre à jour mon CV →
+                </a>
+            </div>
+
+            <!-- Score Employabilité -->
+            {% if profil.score_employabilite %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Score d'employabilité</p>
+                <div class="flex items-end gap-2 mb-4">
+                    <span class="text-4xl font-bold text-gray-900">{{ profil.score_employabilite.score }}</span>
+                    <span class="text-gray-400 text-lg mb-1">/100</span>
+                </div>
+                <!-- Barre de progression -->
+                <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
+                    <div class="bg-[#2D6A4F] h-2 rounded-full"
+                         style="width: {{ profil.score_employabilite.score }}%"></div>
+                </div>
+                {% if profil.score_employabilite.points_forts %}
+                <div class="mb-3">
+                    <p class="text-xs font-medium text-gray-700 mb-2">Points forts</p>
+                    {% for point in profil.score_employabilite.points_forts %}
+                    <div class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                        {{ point }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Compétences -->
+            {% if profil.competences_techniques.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Compétences</p>
+                <div class="flex flex-wrap gap-2">
+                    {% for comp in profil.competences_techniques.all %}
+                    <span class="bg-green-50 text-[#2D6A4F] text-xs font-medium px-3 py-1 rounded-full">
+                        {{ comp.nom }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Colonne droite — Contenu principal -->
+        <div class="md:col-span-2 space-y-6">
+
+            <!-- Career Gap Analyzer CTA -->
+            <div class="bg-green-50 rounded-2xl p-6 flex items-center justify-between">
+                <div>
+                    <p class="font-semibold text-gray-900 mb-1">Career Gap Analyzer</p>
+                    <p class="text-sm text-gray-500">Définis ton objectif et reçois une roadmap personnalisée.</p>
+                </div>
+                <a href="{% url 'matching:career_gap' %}"
+                   class="bg-[#2D6A4F] text-white font-medium px-4 py-2 rounded-xl hover:bg-[#245A42] transition text-sm whitespace-nowrap">
+                    Analyser →
+                </a>
+            </div>
+
+            <!-- Formations -->
+            {% if profil.formations.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Formation</p>
+                {% for formation in profil.formations.all %}
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ formation.diplome }}</p>
+                        <p class="text-xs text-gray-500">{{ formation.etablissement }} {% if formation.annee %}· {{ formation.annee }}{% endif %}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Expériences -->
+            {% if profil.experiences.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Expérience</p>
+                {% for exp in profil.experiences.all %}
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 bg-yellow-50 rounded-lg flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ exp.poste }}</p>
+                        <p class="text-xs text-gray-500">{{ exp.entreprise }} {% if exp.duree %}· {{ exp.duree }}{% endif %}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
 {% endblock %}
