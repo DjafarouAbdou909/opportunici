@@ -1,9 +1,25 @@
 import json
+import re
 from groq import Groq
 from django.conf import settings
 
 
 client = Groq(api_key=settings.GROQ_API_KEY)
+
+
+def reparer_json(texte: str) -> str:
+    """
+    Répare les erreurs courantes de syntaxe JSON générées par le LLM.
+
+    Args:
+        texte: Chaîne JSON potentiellement malformée
+
+    Returns:
+        Chaîne JSON corrigée
+    """
+    # Corrige les clés mal formées du type "cle>valeur au lieu de "cle":valeur
+    texte = re.sub(r'"(\w+)>', r'"\1":', texte)
+    return texte
 
 
 def analyser_cv(texte_cv: str) -> dict:
@@ -18,6 +34,8 @@ def analyser_cv(texte_cv: str) -> dict:
     """
 
     prompt = f"""Tu es un expert en analyse de CV. Extrais toutes les informations professionnelles de ce CV et retourne UNIQUEMENT un objet JSON valide, sans markdown, sans explication.
+
+IMPORTANT : respecte STRICTEMENT la syntaxe JSON. Chaque clé doit être suivie de ":" (deux-points), jamais de ">" ou autre caractère.
 
 Contenu du CV :
 {texte_cv}
@@ -49,6 +67,7 @@ Structure JSON attendue :
         )
 
         brut = response.choices[0].message.content.strip()
+        brut = reparer_json(brut)
         return json.loads(brut)
 
     except json.JSONDecodeError:
