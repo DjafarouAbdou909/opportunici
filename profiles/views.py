@@ -36,29 +36,32 @@ def upload_cv_view(request):
             fichier = form.cleaned_data['cv_pdf']
             
             try:
-                # Extraire le texte du PDF
+                # Étape 1 — Extraire le texte du PDF
                 texte_cv = extraire_texte_pdf(fichier)
                 
-                # Analyser avec Claude API
+                # Étape 2 — Analyser avec l'IA
                 donnees_profil = analyser_cv(texte_cv)
                 
-                # Sauvegarder le profil
-                profil, created = Profil.objects.get_or_create(
-                    utilisateur=request.user
-                )
+                # Étape 3 — Sauvegarder le profil
+                try:
+                    profil = Profil.objects.get(utilisateur=request.user)
+                except Profil.DoesNotExist:
+                    profil = Profil(
+                        utilisateur=request.user,
+                        slug=str(uuid.uuid4())[:8]
+                    )
                 
                 profil.titre_professionnel = donnees_profil.get('titre_professionnel', '')
                 profil.resume = donnees_profil.get('resume', '')
                 profil.localisation = donnees_profil.get('localisation', '')
                 profil.niveau_carriere = donnees_profil.get('niveau_carriere', 'etudiant')
                 
-                # Générer un slug unique
                 if not profil.slug:
                     profil.slug = str(uuid.uuid4())[:8]
                 
                 profil.save()
                 
-                # Sauvegarder les compétences
+                # Étape 4 — Sauvegarder les compétences
                 CompetenceTechnique.objects.filter(profil=profil).delete()
                 for competence in donnees_profil.get('competences_techniques', []):
                     CompetenceTechnique.objects.create(
@@ -66,12 +69,12 @@ def upload_cv_view(request):
                         nom=competence
                     )
                 
-                # Sauvegarder les soft skills
+                # Étape 5 — Sauvegarder les soft skills
                 SoftSkill.objects.filter(profil=profil).delete()
                 for skill in donnees_profil.get('soft_skills', []):
                     SoftSkill.objects.create(profil=profil, nom=skill)
                 
-                # Sauvegarder les formations
+                # Étape 6 — Sauvegarder les formations
                 Formation.objects.filter(profil=profil).delete()
                 for formation in donnees_profil.get('formation', []):
                     Formation.objects.create(
@@ -82,7 +85,7 @@ def upload_cv_view(request):
                         annee=formation.get('annee', '')
                     )
                 
-                # Sauvegarder les expériences
+                # Étape 7 — Sauvegarder les expériences
                 Experience.objects.filter(profil=profil).delete()
                 for exp in donnees_profil.get('experience', []):
                     Experience.objects.create(
@@ -93,7 +96,7 @@ def upload_cv_view(request):
                         description=exp.get('description', '')
                     )
                 
-                # Sauvegarder les projets
+                # Étape 8 — Sauvegarder les projets
                 Projet.objects.filter(profil=profil).delete()
                 for projet in donnees_profil.get('projets', []):
                     Projet.objects.create(
@@ -110,6 +113,8 @@ def upload_cv_view(request):
                 messages.error(request, f'Erreur : {str(e)}')
             
             except Exception as e:
+                import traceback
+                print("ERREUR COMPLÈTE:", traceback.format_exc())
                 messages.error(request, 'Une erreur inattendue s\'est produite. Réessaie.')
         
     else:
