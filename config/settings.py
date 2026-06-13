@@ -94,3 +94,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Claude API
 CLAUDE_API_KEY = os.getenv('CLAUDE_API_KEY', '')
 DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')

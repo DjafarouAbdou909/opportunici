@@ -1,17 +1,14 @@
 import json
-from openai import OpenAI
+from groq import Groq
 from django.conf import settings
 
 
-client = OpenAI(
-    api_key=settings.DEEPSEEK_API_KEY,
-    base_url="https://api.deepseek.com"
-)
+client = Groq(api_key=settings.GROQ_API_KEY)
 
 
 def analyser_cv(texte_cv: str) -> dict:
     """
-    Analyse un CV en texte brut via DeepSeek API et retourne un JSON structuré.
+    Analyse un CV en texte brut via Groq API et retourne un JSON structuré.
 
     Args:
         texte_cv: Texte brut extrait du PDF du CV
@@ -45,7 +42,7 @@ Structure JSON attendue :
 
     try:
         response = client.chat.completions.create(
-            model="deepseek-chat",
+            model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             max_tokens=2000
@@ -55,7 +52,7 @@ Structure JSON attendue :
         return json.loads(brut)
 
     except json.JSONDecodeError:
-        raise ValueError("DeepSeek a retourné un JSON invalide — réessaie")
+        raise ValueError("Groq a retourné un JSON invalide — réessaie")
 
     except Exception as e:
-        raise ValueError(f"Erreur API DeepSeek : {str(e)}")
+        raise ValueError(f"Erreur API Groq : {str(e)}")
