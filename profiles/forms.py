@@ -22,7 +22,7 @@ class UploadCVForm(forms.Form):
             if not fichier.name.endswith('.pdf'):
                 raise forms.ValidationError('Seuls les fichiers PDF sont acceptés.')
             
-            # Vérifier la taille (5MB max)
+            # Vérifier la taille
             if fichier.size > 5 * 1024 * 1024:
                 raise forms.ValidationError('Le fichier ne doit pas dépasser 5MB.')
         

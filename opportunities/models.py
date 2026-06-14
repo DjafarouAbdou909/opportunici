@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Opportunite(models.Model):
-    """Opportunité professionnelle — emploi, stage, bourse ou hackathon."""
+    """Opportunité professionnelle emploi, stage, bourse ou hackathon."""
     
     TYPE_CHOICES = [
         ('emploi', 'Emploi'),

@@ -79,8 +79,7 @@ class Formation(models.Model):
     diplome = models.CharField(max_length=200)
     etablissement = models.CharField(max_length=200)
     domaine = models.CharField(max_length=200, blank=True)
-    annee = models.CharField(max_length=10, blank=True)
-
+    annee = models.CharField(max_length=50, blank=True)
     def __str__(self):
         return f"{self.diplome} — {self.etablissement}"
 
