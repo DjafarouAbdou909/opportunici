@@ -42,5 +42,15 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     {% block extra_js %}{% endblock %}
+<script>
+setTimeout(function() {
+    const messages = document.querySelectorAll(".fixed.top-4.right-4 > div");
+    messages.forEach(function(msg) {
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+        setTimeout(() => msg.remove(), 500);
+    });
+}, 4000);
+</script>
 </body>
 </html>
