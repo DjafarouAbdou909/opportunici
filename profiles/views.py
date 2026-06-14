@@ -36,13 +36,13 @@ def upload_cv_view(request):
             fichier = form.cleaned_data['cv_pdf']
             
             try:
-                # Étape 1 — Extraire le texte du PDF
+                # Extraire le texte du PDF
                 texte_cv = extraire_texte_pdf(fichier)
                 
-                # Étape 2 — Analyser avec l'IA
+                # Analyser avec l'IA
                 donnees_profil = analyser_cv(texte_cv)
                 
-                # Étape 3 — Sauvegarder le profil
+                #Sauvegarder le profil
                 try:
                     profil = Profil.objects.get(utilisateur=request.user)
                 except Profil.DoesNotExist:
@@ -50,10 +50,9 @@ def upload_cv_view(request):
                         utilisateur=request.user,
                         slug=str(uuid.uuid4())[:8]
                     )
-                
-                profil.titre_professionnel = donnees_profil.get('titre_professionnel', '')
-                profil.resume = donnees_profil.get('resume', '')
-                profil.localisation = donnees_profil.get('localisation', '')
+                profil.titre_professionnel = donnees_profil.get('titre_professionnel') or ''
+                profil.resume = donnees_profil.get('resume') or ''
+                profil.localisation = donnees_profil.get('localisation') or ''
                 profil.niveau_carriere = donnees_profil.get('niveau_carriere', 'etudiant')
                 
                 if not profil.slug:
@@ -61,22 +60,22 @@ def upload_cv_view(request):
                 
                 profil.save()
                 
-                # Étape 4 — Sauvegarder les compétences
+                # Sauvegarder les compétences
                 CompetenceTechnique.objects.filter(profil=profil).delete()
-                for competence in donnees_profil.get('competences_techniques', []):
+                for competence in donnees_profil.get('competences_techniques') or []:
                     CompetenceTechnique.objects.create(
                         profil=profil,
                         nom=competence
                     )
                 
-                # Étape 5 — Sauvegarder les soft skills
+                # Sauvegarder les soft skills
                 SoftSkill.objects.filter(profil=profil).delete()
-                for skill in donnees_profil.get('soft_skills', []):
+                for skill in donnees_profil.get('soft_skills') or []:
                     SoftSkill.objects.create(profil=profil, nom=skill)
                 
-                # Étape 6 — Sauvegarder les formations
+                # Sauvegarder les formations
                 Formation.objects.filter(profil=profil).delete()
-                for formation in donnees_profil.get('formation', []):
+                for formation in donnees_profil.get('formation') or []:
                     Formation.objects.create(
                         profil=profil,
                         diplome=formation.get('diplome', ''),
@@ -85,9 +84,9 @@ def upload_cv_view(request):
                         annee=formation.get('annee', '')
                     )
                 
-                # Étape 7 — Sauvegarder les expériences
+                # Sauvegarder les expériences
                 Experience.objects.filter(profil=profil).delete()
-                for exp in donnees_profil.get('experience', []):
+                for exp in donnees_profil.get('experience') or []:
                     Experience.objects.create(
                         profil=profil,
                         poste=exp.get('poste', ''),
@@ -96,9 +95,9 @@ def upload_cv_view(request):
                         description=exp.get('description', '')
                     )
                 
-                # Étape 8 — Sauvegarder les projets
+                # Sauvegarder les projets
                 Projet.objects.filter(profil=profil).delete()
-                for projet in donnees_profil.get('projets', []):
+                for projet in donnees_profil.get('projets') or []:
                     Projet.objects.create(
                         profil=profil,
                         nom=projet.get('nom', ''),
