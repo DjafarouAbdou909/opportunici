@@ -80,8 +80,8 @@ def upload_cv_view(request):
                         profil=profil,
                         diplome=formation.get('diplome', ''),
                         etablissement=formation.get('etablissement', ''),
-                        domaine=formation.get('domaine', ''),
-                        annee=formation.get('annee', '')
+                        domaine=formation.get('domaine') or '',
+                        annee=formation.get('annee') or ''
                     )
                 
                 # Sauvegarder les expériences
@@ -91,8 +91,8 @@ def upload_cv_view(request):
                         profil=profil,
                         poste=exp.get('poste', ''),
                         entreprise=exp.get('entreprise', ''),
-                        duree=exp.get('duree', ''),
-                        description=exp.get('description', '')
+                        duree=exp.get('duree') or '',
+                        description=exp.get('description') or ''
                     )
                 
                 # Sauvegarder les projets
@@ -101,7 +101,7 @@ def upload_cv_view(request):
                     Projet.objects.create(
                         profil=profil,
                         nom=projet.get('nom', ''),
-                        description=projet.get('description', ''),
+                        description=projet.get('description') or '',
                         technologies=', '.join(projet.get('technologies', []))
                     )
                 
