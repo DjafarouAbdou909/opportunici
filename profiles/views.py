@@ -76,8 +76,8 @@ def upload_cv_view(request):
                 for formation in donnees_profil.get('formation') or []:
                     Formation.objects.create(
                         profil=profil,
-                        diplome=formation.get('diplome', ''),
-                        etablissement=formation.get('etablissement', ''),
+                        diplome=formation.get('diplome') or '',
+                        etablissement=formation.get('etablissement') or '',
                         domaine=formation.get('domaine') or '',
                         annee=formation.get('annee') or ''
                     )
@@ -87,7 +87,7 @@ def upload_cv_view(request):
                 for exp in donnees_profil.get('experience') or []:
                     Experience.objects.create(
                         profil=profil,
-                        poste=exp.get('poste', ''),
+                        poste=exp.get('poste') or '',
                         entreprise=exp.get('entreprise') or '',
                         duree=exp.get('duree') or '',
                         description=exp.get('description') or ''
@@ -98,7 +98,7 @@ def upload_cv_view(request):
                 for projet in donnees_profil.get('projets') or []:
                     Projet.objects.create(
                         profil=profil,
-                        nom=projet.get('nom', ''),
+                        nom=projet.get('nom') or '',
                         description=projet.get('description') or '',
                         technologies=', '.join(projet.get('technologies', []) or [])
                     )

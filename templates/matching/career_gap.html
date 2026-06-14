@@ -1,7 +1,132 @@
 {% extends 'base.html' %}
-{% block title %}Career Gap — OpportuniCI{% endblock %}
+
+{% block title %}Career Gap Analyzer — OpportuniCI{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-    <p class="text-gray-500">Career Gap Analyzer — en construction</p>
+
+<nav class="bg-[#FAFAF8] border-b border-gray-100 px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <a href="/" class="text-xl font-bold text-gray-900">
+            Opportuni<span class="text-[#2D6A4F]">CI</span>
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="{% url 'profiles:dashboard' %}"
+               class="text-sm font-medium text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+                ← Dashboard
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Career Gap Analyzer</h1>
+        <p class="text-gray-500 text-sm">Définis ton objectif et reçois une roadmap personnalisée 30/60/90 jours.</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 mb-8">
+        <form method="POST">
+            {% csrf_token %}
+            <label class="text-sm font-medium text-gray-700 mb-2 block">
+                {{ form.titre_objectif.label }}
+            </label>
+            <div class="flex gap-3">
+                {{ form.titre_objectif }}
+                <button type="submit"
+                    class="bg-[#2D6A4F] text-white font-medium px-6 py-3 rounded-xl hover:bg-[#245A42] text-sm whitespace-nowrap">
+                    Analyser
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if objectif %}
+    <!-- Résultats -->
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-1">Objectif : {{ objectif.titre_objectif }}</h2>
+        <p class="text-sm text-gray-500">Voici ton analyse personnalisée</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+        <!-- Compétences acquises -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <p class="text-xs font-semibold text-green-700 uppercase tracking-widest mb-4">✓ Compétences acquises</p>
+            <div class="flex flex-wrap gap-2">
+                {% for comp in objectif.competences_acquises %}
+                <span class="bg-green-50 text-[#2D6A4F] text-xs font-medium px-3 py-1 rounded-full">{{ comp }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Compétences manquantes -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <p class="text-xs font-semibold text-orange-600 uppercase tracking-widest mb-4">⚡ Compétences à acquérir</p>
+            <div class="flex flex-wrap gap-2">
+                {% for comp in objectif.competences_manquantes %}
+                <span class="bg-orange-50 text-orange-700 text-xs font-medium px-3 py-1 rounded-full">{{ comp }}</span>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    {% if roadmap %}
+    <!-- Roadmap 30/60/90 -->
+    <div class="space-y-4">
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-[#2D6A4F] font-bold text-sm">30</div>
+                <p class="font-semibold text-gray-900">Jours 1-30</p>
+            </div>
+            <ul class="space-y-2">
+                {% for action in roadmap.plan_30_jours %}
+                <li class="flex items-start gap-2 text-sm text-gray-600">
+                    <span class="text-[#2D6A4F] mt-1">→</span>
+                    {{ action }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">60</div>
+                <p class="font-semibold text-gray-900">Jours 31-60</p>
+            </div>
+            <ul class="space-y-2">
+                {% for action in roadmap.plan_60_jours %}
+                <li class="flex items-start gap-2 text-sm text-gray-600">
+                    <span class="text-blue-600 mt-1">→</span>
+                    {{ action }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 font-bold text-sm">90</div>
+                <p class="font-semibold text-gray-900">Jours 61-90</p>
+            </div>
+            <ul class="space-y-2">
+                {% for action in roadmap.plan_90_jours %}
+                <li class="flex items-start gap-2 text-sm text-gray-600">
+                    <span class="text-purple-600 mt-1">→</span>
+                    {{ action }}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+    {% endif %}
+
+    {% endif %}
+
 </div>
+
 {% endblock %}

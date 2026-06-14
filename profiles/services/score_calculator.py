@@ -25,7 +25,7 @@ def calculer_score_employabilite(profil_data: dict) -> dict:
         Dictionnaire avec score, points forts, points faibles, recommandations
     """
 
-    prompt = f"""Tu es un expert en recrutement tech en Afrique de l'Ouest. Analyse ce profil professionnel et donne un score d'employabilité réaliste.
+    prompt = f"""Tu es un expert en recrutement tech en Afrique de l'Ouest. Analyse ce profil professionnel et donne un score d'employabilité réaliste sur 100.
 
 Profil :
 - Titre : {profil_data.get('titre_professionnel', '')}
@@ -37,6 +37,15 @@ Profil :
 - Projets : {profil_data.get('projets', [])}
 - Certifications : {', '.join(profil_data.get('certifications', []))}
 
+Méthode de notation à suivre STRICTEMENT :
+- Compétences techniques : jusqu'à 25 points (nombre et pertinence pour le marché tech)
+- Expériences professionnelles : jusqu'à 30 points (pertinence et durée)
+- Formations : jusqu'à 20 points (niveau et domaine)
+- Projets concrets : jusqu'à 15 points (nombre et qualité)
+- Certifications : jusqu'à 10 points
+
+Additionne ces sous-scores pour obtenir le score final sur 100.
+
 IMPORTANT : respecte STRICTEMENT la syntaxe JSON, chaque clé suivie de ":".
 
 Retourne UNIQUEMENT ce JSON, sans markdown :
@@ -45,15 +54,14 @@ Retourne UNIQUEMENT ce JSON, sans markdown :
     "points_forts": ["point fort 1", "point fort 2", "point fort 3"],
     "points_faibles": ["point faible 1", "point faible 2"],
     "recommandations": ["recommandation 1", "recommandation 2", "recommandation 3"]
-}}
-
-Critères : pertinence des compétences pour le marché tech ivoirien, qualité et nombre des projets, expérience professionnelle, certifications, cohérence du parcours. Score entre 0 et 100, sois réaliste et constructif."""
+}}"""
 
     try:
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
+            temperature=0,
             max_tokens=1000
         )
 
