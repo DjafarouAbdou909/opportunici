@@ -12,7 +12,7 @@
         <div class="flex items-center gap-4">
             <a href="{% url 'profiles:dashboard' %}"
                class="text-sm font-medium text-gray-700 border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
-                ← Dashboard
+                Dashboard
             </a>
         </div>
     </div>
@@ -25,7 +25,6 @@
         <p class="text-gray-500 text-sm">Définis ton objectif et reçois une roadmap personnalisée 30/60/90 jours.</p>
     </div>
 
-    <!-- Formulaire -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 mb-8">
         <form method="POST">
             {% csrf_token %}
@@ -43,7 +42,7 @@
     </div>
 
     {% if objectif %}
-    <!-- Résultats -->
+
     <div class="mb-8">
         <h2 class="text-xl font-bold text-gray-900 mb-1">Objectif : {{ objectif.titre_objectif }}</h2>
         <p class="text-sm text-gray-500">Voici ton analyse personnalisée</p>
@@ -51,9 +50,8 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
-        <!-- Compétences acquises -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <p class="text-xs font-semibold text-green-700 uppercase tracking-widest mb-4">✓ Compétences acquises</p>
+            <p class="text-xs font-semibold text-green-700 uppercase tracking-widest mb-4">Compétences acquises</p>
             <div class="flex flex-wrap gap-2">
                 {% for comp in objectif.competences_acquises %}
                 <span class="bg-green-50 text-[#2D6A4F] text-xs font-medium px-3 py-1 rounded-full">{{ comp }}</span>
@@ -61,12 +59,22 @@
             </div>
         </div>
 
-        <!-- Compétences manquantes -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <p class="text-xs font-semibold text-orange-600 uppercase tracking-widest mb-4">⚡ Compétences à acquérir</p>
-            <div class="flex flex-wrap gap-2">
+            <p class="text-xs font-semibold text-orange-600 uppercase tracking-widest mb-4">Compétences à acquérir</p>
+            <div class="space-y-3">
                 {% for comp in objectif.competences_manquantes %}
-                <span class="bg-orange-50 text-orange-700 text-xs font-medium px-3 py-1 rounded-full">{{ comp }}</span>
+                <div class="bg-orange-50 rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-sm font-semibold text-orange-700">{{ comp.nom }}</span>
+                        <span class="text-xs font-medium px-2 py-0.5 rounded-full
+                            {% if comp.priorite == 'Haute' %}bg-red-100 text-red-700
+                            {% elif comp.priorite == 'Moyenne' %}bg-yellow-100 text-yellow-700
+                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                            {{ comp.priorite }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500">{{ comp.description }}</p>
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -74,7 +82,6 @@
     </div>
 
     {% if roadmap %}
-    <!-- Roadmap 30/60/90 -->
     <div class="space-y-4">
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
@@ -82,11 +89,12 @@
                 <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center text-[#2D6A4F] font-bold text-sm">30</div>
                 <p class="font-semibold text-gray-900">Jours 1-30</p>
             </div>
-            <ul class="space-y-2">
+            <ul class="space-y-3">
                 {% for action in roadmap.plan_30_jours %}
-                <li class="flex items-start gap-2 text-sm text-gray-600">
-                    <span class="text-[#2D6A4F] mt-1">→</span>
-                    {{ action }}
+                <li class="text-sm border-l-2 border-[#2D6A4F] pl-3">
+                    <p class="font-medium text-gray-900">{{ action.action }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Objectif : {{ action.objectif }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Basé sur : {{ action.competence_utilisee }}</p>
                 </li>
                 {% endfor %}
             </ul>
@@ -97,11 +105,12 @@
                 <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold text-sm">60</div>
                 <p class="font-semibold text-gray-900">Jours 31-60</p>
             </div>
-            <ul class="space-y-2">
+            <ul class="space-y-3">
                 {% for action in roadmap.plan_60_jours %}
-                <li class="flex items-start gap-2 text-sm text-gray-600">
-                    <span class="text-blue-600 mt-1">→</span>
-                    {{ action }}
+                <li class="text-sm border-l-2 border-blue-600 pl-3">
+                    <p class="font-medium text-gray-900">{{ action.action }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Objectif : {{ action.objectif }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Basé sur : {{ action.competence_utilisee }}</p>
                 </li>
                 {% endfor %}
             </ul>
@@ -112,11 +121,12 @@
                 <div class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 font-bold text-sm">90</div>
                 <p class="font-semibold text-gray-900">Jours 61-90</p>
             </div>
-            <ul class="space-y-2">
+            <ul class="space-y-3">
                 {% for action in roadmap.plan_90_jours %}
-                <li class="flex items-start gap-2 text-sm text-gray-600">
-                    <span class="text-purple-600 mt-1">→</span>
-                    {{ action }}
+                <li class="text-sm border-l-2 border-purple-600 pl-3">
+                    <p class="font-medium text-gray-900">{{ action.action }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Objectif : {{ action.objectif }}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Basé sur : {{ action.competence_utilisee }}</p>
                 </li>
                 {% endfor %}
             </ul>
