@@ -15,50 +15,70 @@ def reparer_json(texte: str) -> str:
 
 def analyser_career_gap(profil_data: dict, objectif: str) -> dict:
     """
-    Analyse l'écart entre le profil actuel et l'objectif de carrière visé.
+    Analyse l'écart réel entre le profil actuel et l'objectif de carrière,
+    et génère une roadmap progressive 30/60/90 jours.
 
     Args:
-        profil_data: Dictionnaire avec compétences, expériences, formations
+        profil_data: Dictionnaire avec compétences, expériences, formations, projets
         objectif: Titre du poste/objectif visé (ex: "Machine Learning Engineer")
 
     Returns:
         Dictionnaire avec compétences acquises, manquantes et roadmap 30/60/90 jours
     """
 
-    prompt = f"""Tu es un conseiller carrière expert en tech, spécialisé Afrique de l'Ouest.
+    prompt = f"""Tu es un expert en analyse de carrière et en ingénierie pédagogique.
 
-PROFIL ACTUEL :
+Ta tâche est d'analyser un profil utilisateur et un objectif de carrière pour produire un diagnostic de gap de compétences et un plan d'évolution.
+
+PROFIL UTILISATEUR :
 - Titre actuel : {profil_data.get('titre_professionnel', '')}
 - Niveau : {profil_data.get('niveau_carriere', '')}
-- Compétences techniques actuelles : {', '.join(profil_data.get('competences_techniques', []))}
+- Compétences techniques : {', '.join(profil_data.get('competences_techniques', []))}
 - Expériences : {profil_data.get('experiences', [])}
 - Projets déjà réalisés : {profil_data.get('projets', [])}
 
-OBJECTIF VISÉ : {objectif}
+OBJECTIF DE CARRIÈRE : {objectif}
 
-TÂCHE :
-1. Identifie les 5-10 compétences ESSENTIELLES pour devenir {objectif}
-2. Compare avec les compétences ACTUELLES du profil
-3. "competences_acquises" = intersection (compétences déjà maîtrisées ET pertinentes pour l'objectif)
-4. "competences_manquantes" = compétences essentielles NON présentes dans le profil (maximum 5, par ordre de priorité)
-5. Pour la roadmap, base-toi sur les projets/expériences EXISTANTS du profil quand c'est pertinent. Propose des actions SPÉCIFIQUES et personnalisées, jamais génériques.
+RÈGLES CRITIQUES
 
-IMPORTANT : respecte STRICTEMENT la syntaxe JSON, chaque clé suivie de ":".
+1. competences_acquises
+- uniquement les compétences directement transférables à l'objectif
+- exclure tout ce qui est marginal ou hors-sujet
 
-Retourne UNIQUEMENT ce JSON, sans markdown :
+2. competences_manquantes
+- maximum 5 compétences
+- DOIVENT être classées par priorité réelle (impact sur l'objectif)
+- ne jamais lister tout le domaine
+- chaque compétence doit représenter un "bloc manquant critique" : pose-toi la question "l'utilisateur peut-il raisonnablement atteindre cet objectif SANS cette compétence ?" — si oui, elle n'est pas prioritaire
+
+3. plans (30/60/90 jours)
+Chaque action doit :
+- être spécifique au profil utilisateur
+- utiliser une compétence déjà acquise comme point de départ
+- inclure une progression logique vers l'objectif
+- être concrète (projet, exercice, implémentation, build)
+
+Interdiction absolue :
+- actions génériques ("suivre un cours", "apprendre Python", "regarder des tutoriels")
+
+STYLE
+- motivant mais réaliste
+- pas de culpabilisation
+- orienté ingénierie et progression
+
+CONTRAINTE JSON
+- sortie STRICTEMENT JSON valide
+- aucune explication hors JSON
+- pas de texte avant ou après
+
+Format attendu :
 {{
-    "competences_acquises": ["compétence1", "compétence2"],
-    "competences_manquantes": ["compétence1", "compétence2", "compétence3"],
-    "plan_30_jours": ["action concrète 1", "action concrète 2", "action concrète 3"],
-    "plan_60_jours": ["action concrète 1", "action concrète 2", "action concrète 3"],
-    "plan_90_jours": ["action concrète 1", "action concrète 2", "action concrète 3"]
-}}
-
-Règles pour les actions de la roadmap :
-- INTERDIT : "suivre un cours générique sur Coursera/edX/Udemy" sans précision
-- PRÉFÈRE : approfondir une compétence existante via un projet concret lié au contexte du profil
-- Chaque action doit nommer une compétence PRÉCISE et un livrable CONCRET (ex: "Construire une API REST avec FastAPI exposant un modèle de classification entraîné sur un dataset public")
-- Adapte la difficulté au niveau actuel du profil"""
+    "competences_acquises": [],
+    "competences_manquantes": [],
+    "plan_30_jours": [],
+    "plan_60_jours": [],
+    "plan_90_jours": []
+}}"""
 
     try:
         response = client.chat.completions.create(
