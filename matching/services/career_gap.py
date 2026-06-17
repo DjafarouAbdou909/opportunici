@@ -44,12 +44,14 @@ RÈGLES CRITIQUES
 1. competences_acquises
 - uniquement les compétences directement transférables à l'objectif
 - exclure tout ce qui est marginal ou hors-sujet
+- liste simple de strings
 
 2. competences_manquantes
 - maximum 5 compétences
 - DOIVENT être classées par priorité réelle (impact sur l'objectif)
 - ne jamais lister tout le domaine
 - chaque compétence doit représenter un "bloc manquant critique" : pose-toi la question "l'utilisateur peut-il raisonnablement atteindre cet objectif SANS cette compétence ?" — si oui, elle n'est pas prioritaire
+- pour CHAQUE compétence manquante, remplis OBLIGATOIREMENT les 3 champs : nom, priorite (Haute/Moyenne/Basse), description (1 phrase expliquant pourquoi c'est important)
 
 3. plans (30/60/90 jours)
 Chaque action doit :
@@ -57,9 +59,11 @@ Chaque action doit :
 - utiliser une compétence déjà acquise comme point de départ
 - inclure une progression logique vers l'objectif
 - être concrète (projet, exercice, implémentation, build)
+- pour CHAQUE action, remplis OBLIGATOIREMENT les 3 champs : action (le projet/exercice concret à faire), objectif (1 phrase expliquant ce que ça apporte vers l'objectif final, JAMAIS vide), competence_utilisee (la compétence de départ utilisée)
 
 Interdiction absolue :
 - actions génériques ("suivre un cours", "apprendre Python", "regarder des tutoriels")
+- champ "objectif" vide ou manquant dans les actions de roadmap
 
 STYLE
 - motivant mais réaliste
@@ -70,14 +74,23 @@ CONTRAINTE JSON
 - sortie STRICTEMENT JSON valide
 - aucune explication hors JSON
 - pas de texte avant ou après
+- respecte EXACTEMENT la structure ci-dessous, tous les champs sont obligatoires et ne doivent jamais être vides
 
 Format attendu :
 {{
-    "competences_acquises": [],
-    "competences_manquantes": [],
-    "plan_30_jours": [],
-    "plan_60_jours": [],
-    "plan_90_jours": []
+    "competences_acquises": ["string", "string"],
+    "competences_manquantes": [
+        {{"nom": "string", "priorite": "Haute", "description": "string"}}
+    ],
+    "plan_30_jours": [
+        {{"action": "string", "objectif": "string", "competence_utilisee": "string"}}
+    ],
+    "plan_60_jours": [
+        {{"action": "string", "objectif": "string", "competence_utilisee": "string"}}
+    ],
+    "plan_90_jours": [
+        {{"action": "string", "objectif": "string", "competence_utilisee": "string"}}
+    ]
 }}"""
 
     try:
@@ -86,7 +99,7 @@ Format attendu :
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
             temperature=0.3,
-            max_tokens=1500
+            max_tokens=2000
         )
 
         brut = response.choices[0].message.content.strip()
