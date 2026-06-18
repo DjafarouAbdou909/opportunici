@@ -13,6 +13,40 @@ def reparer_json(texte: str) -> str:
     return texte
 
 
+def normaliser_resultat(resultat: dict) -> dict:
+    """
+    Corrige les clés alternatives que le LLM peut utiliser par erreur,
+    pour garantir un format cohérent attendu par le template.
+    """
+    competences_corrigees = []
+    for comp in resultat.get('competences_manquantes', []):
+        if isinstance(comp, dict):
+            nom = comp.get('nom') or comp.get('competence') or ''
+            competences_corrigees.append({
+                'nom': nom,
+                'priorite': comp.get('priorite', 'Moyenne'),
+                'description': comp.get('description', '')
+            })
+        else:
+            competences_corrigees.append({'nom': str(comp), 'priorite': 'Moyenne', 'description': ''})
+    resultat['competences_manquantes'] = competences_corrigees
+
+    for cle_plan in ['plan_30_jours', 'plan_60_jours', 'plan_90_jours']:
+        actions_corrigees = []
+        for action in resultat.get(cle_plan, []):
+            if isinstance(action, dict):
+                actions_corrigees.append({
+                    'action': action.get('action') or action.get('titre') or '',
+                    'objectif': action.get('objectif') or action.get('but') or '',
+                    'competence_utilisee': action.get('competence_utilisee') or action.get('competence') or ''
+                })
+            else:
+                actions_corrigees.append({'action': str(action), 'objectif': '', 'competence_utilisee': ''})
+        resultat[cle_plan] = actions_corrigees
+
+    return resultat
+
+
 def analyser_career_gap(profil_data: dict, objectif: str) -> dict:
     """
     Analyse l'écart réel entre le profil actuel et l'objectif de carrière,
