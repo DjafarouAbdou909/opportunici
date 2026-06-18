@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from .services.qr_generator import generer_qr_code
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UploadCVForm
@@ -73,7 +75,11 @@ def upload_cv_view(request):
                 if not profil.slug:
                     profil.slug = str(uuid.uuid4())[:8]
 
+                # Générer le QR code pointant vers le profil public
+                profil_url = request.build_absolute_uri(f"/profiles/{request.user.username}/")
+                profil.qr_code = generer_qr_code(profil_url)
                 profil.save()
+
 
                 # Sauvegarder les compétences
                 CompetenceTechnique.objects.filter(profil=profil).delete()

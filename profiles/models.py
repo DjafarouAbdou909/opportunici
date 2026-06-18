@@ -27,6 +27,7 @@ class Profil(models.Model):
     )
     cv_pdf = models.FileField(upload_to='cvs/', blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True)
+    qr_code = models.ImageField(upload_to='qrcodes/', blank=True, null=True)
     est_public = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
