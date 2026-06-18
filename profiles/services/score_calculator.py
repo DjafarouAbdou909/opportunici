@@ -15,19 +15,20 @@ def reparer_json(texte: str) -> str:
 
 def calculer_score_employabilite(profil_data: dict) -> dict:
     """
-    Calcule un score d'employabilité via IA en analysant le profil complet.
+    Calcule un score d'employabilité riche via IA en analysant le profil complet.
 
     Args:
         profil_data: Dictionnaire contenant les infos du profil
                      (titre, compétences, expériences, formations, projets)
 
     Returns:
-        Dictionnaire avec score, points forts, points faibles, recommandations
+        Dictionnaire avec score, résumé, points forts détaillés,
+        axes de progrès détaillés, et conseils stratégiques
     """
 
-    prompt = f"""Tu es un expert en recrutement tech en Afrique de l'Ouest. Analyse ce profil professionnel et donne un score d'employabilité réaliste sur 100.
+    prompt = f"""Tu es un expert en recrutement tech en Afrique de l'Ouest, reconnu pour tes analyses de CV détaillées et bienveillantes.
 
-Profil :
+Profil à analyser :
 - Titre : {profil_data.get('titre_professionnel', '')}
 - Niveau : {profil_data.get('niveau_carriere', '')}
 - Compétences techniques : {', '.join(profil_data.get('competences_techniques', []))}
@@ -37,23 +38,29 @@ Profil :
 - Projets : {profil_data.get('projets', [])}
 - Certifications : {', '.join(profil_data.get('certifications', []))}
 
-Méthode de notation à suivre STRICTEMENT :
-- Compétences techniques : jusqu'à 25 points (nombre et pertinence pour le marché tech)
-- Expériences professionnelles : jusqu'à 30 points (pertinence et durée)
-- Formations : jusqu'à 20 points (niveau et domaine)
-- Projets concrets : jusqu'à 15 points (nombre et qualité)
+Méthode de notation à suivre STRICTEMENT pour le score :
+- Compétences techniques : jusqu'à 25 points
+- Expériences professionnelles : jusqu'à 30 points
+- Formations : jusqu'à 20 points
+- Projets concrets : jusqu'à 15 points
 - Certifications : jusqu'à 10 points
 
-Additionne ces sous-scores pour obtenir le score final sur 100.
+TÂCHE :
+1. Calcule le score selon la grille ci-dessus
+2. Rédige un résumé qualitatif (2-3 phrases) qui contextualise le profil dans son ensemble, en mentionnant des éléments SPÉCIFIQUES du profil (pas générique)
+3. Liste 3 à 5 points forts DÉTAILLÉS (1-2 phrases chacun), en citant des éléments concrets et chiffrés du profil quand possible
+4. Liste 3 à 5 axes de progrès DÉTAILLÉS (1-2 phrases chacun), expliquant le "pourquoi" de chaque point, de façon constructive et jamais culpabilisante
+5. Donne 3 à 5 conseils stratégiques actionnables et concrets
 
 IMPORTANT : respecte STRICTEMENT la syntaxe JSON, chaque clé suivie de ":".
 
 Retourne UNIQUEMENT ce JSON, sans markdown :
 {{
     "score": 75,
-    "points_forts": ["point fort 1", "point fort 2", "point fort 3"],
-    "points_faibles": ["point faible 1", "point faible 2"],
-    "recommandations": ["recommandation 1", "recommandation 2", "recommandation 3"]
+    "resume": "string détaillé contextualisant le profil",
+    "points_forts": ["point fort détaillé 1", "point fort détaillé 2", "point fort détaillé 3"],
+    "points_faibles": ["axe de progrès détaillé 1", "axe de progrès détaillé 2"],
+    "recommandations": ["conseil actionnable 1", "conseil actionnable 2", "conseil actionnable 3"]
 }}"""
 
     try:
@@ -61,8 +68,8 @@ Retourne UNIQUEMENT ce JSON, sans markdown :
             model="llama-3.3-70b-versatile",
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object"},
-            temperature=0,
-            max_tokens=1000
+            temperature=0.2,
+            max_tokens=1800
         )
 
         brut = response.choices[0].message.content.strip()

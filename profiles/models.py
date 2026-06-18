@@ -126,6 +126,7 @@ class ScoreEmployabilite(models.Model):
         related_name='score_employabilite'
     )
     score = models.IntegerField(default=0)
+    resume = models.TextField(blank=True, default='')
     points_forts = models.JSONField(default=list)
     points_faibles = models.JSONField(default=list)
     recommandations = models.JSONField(default=list)

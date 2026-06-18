@@ -24,6 +24,20 @@ def dashboard_view(request):
         'profil': profil
     })
 
+@login_required
+def score_detail_view(request):
+    """Vue détaillée de l'analyse du score d'employabilité."""
+    try:
+        profil = request.user.profil
+        score = profil.score_employabilite
+    except (Profil.DoesNotExist, ScoreEmployabilite.DoesNotExist):
+        messages.error(request, 'Tu dois d\'abord uploader ton CV pour voir ton analyse.')
+        return redirect('profiles:upload_cv')
+
+    return render(request, 'profiles/score_detail.html', {
+        'profil': profil,
+        'score': score
+    })
 
 @login_required
 def upload_cv_view(request):
@@ -121,6 +135,7 @@ def upload_cv_view(request):
                     profil=profil,
                     defaults={
                         'score': score_data.get('score', 0),
+                        'resume': score_data.get('resume', ''),
                         'points_forts': score_data.get('points_forts', []),
                         'points_faibles': score_data.get('points_faibles', []),
                         'recommandations': score_data.get('recommandations', []),
