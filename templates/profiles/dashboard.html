@@ -55,17 +55,21 @@
                     Mettre à jour mon CV →
                 </a>
             </div>
-            {% if profil.score_employabilite %}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Score d'employabilité</p>
-                <div class="flex items-end gap-2 mb-4">
-                    <span class="text-4xl font-bold text-gray-900">{{ profil.score_employabilite.score }}</span>
-                    <span class="text-gray-400 text-lg mb-1">/100</span>
-                </div>
-                <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
-                    <div class="bg-[#2D6A4F] h-2 rounded-full" style="width: {{ profil.score_employabilite.score }}%"></div>
-                </div>
-            </div>
+          {% if profil.score_employabilite %}
+<a href="{% url 'profiles:score_detail' %}">
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition cursor-pointer">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Score d'employabilité</p>
+    <div class="flex items-end gap-2 mb-4">
+        <span class="text-4xl font-bold text-gray-900">{{ profil.score_employabilite.score }}</span>
+        <span class="text-gray-400 text-lg mb-1">/100</span>
+    </div>
+    <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
+        <div class="bg-[#2D6A4F] h-2 rounded-full" style="width: {{ profil.score_employabilite.score }}%"></div>
+    </div>
+    <p class="text-xs text-[#2D6A4F] font-medium">Voir l'analyse complète →</p>
+</div>
+</a>
+
             {% endif %}
             {% if profil.competences_techniques.all %}
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
