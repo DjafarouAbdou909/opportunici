@@ -1,7 +1,127 @@
 {% extends 'base.html' %}
-{% block title %}Profil — OpportuniCI{% endblock %}
+
+{% block title %}{{ profil.utilisateur.first_name }} {{ profil.utilisateur.last_name }} — OpportuniCI{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-    <p class="text-gray-500">Profil public — en construction</p>
+
+<nav class="bg-[#FAFAF8] border-b border-gray-100 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex items-center justify-between">
+        <a href="/" class="text-xl font-bold text-gray-900">
+            Opportuni<span class="text-[#2D6A4F]">CI</span>
+        </a>
+    </div>
+</nav>
+
+<div class="max-w-4xl mx-auto px-6 py-10">
+
+    <!-- En-tête profil -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-full bg-[#2D6A4F] flex items-center justify-center text-white font-bold text-xl">
+                {{ profil.utilisateur.first_name|first }}{{ profil.utilisateur.last_name|first }}
+            </div>
+            <div>
+                <p class="text-xl font-bold text-gray-900">{{ profil.utilisateur.first_name }} {{ profil.utilisateur.last_name }}</p>
+                <p class="text-sm text-gray-500">{{ profil.titre_professionnel }}</p>
+                {% if profil.localisation %}
+                <p class="text-xs text-gray-400 mt-1">{{ profil.localisation }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% if profil.qr_code %}
+        <img src="{{ profil.qr_code.url }}" alt="QR Code" class="w-20 h-20">
+        {% endif %}
+    </div>
+
+    {% if profil.resume %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">
+        <p class="text-sm text-gray-600 leading-relaxed">{{ profil.resume }}</p>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <div class="md:col-span-1 space-y-6">
+
+            {% if profil.competences_techniques.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Compétences</p>
+                <div class="flex flex-wrap gap-2">
+                    {% for comp in profil.competences_techniques.all %}
+                    <span class="bg-green-50 text-[#2D6A4F] text-xs font-medium px-3 py-1 rounded-full">{{ comp.nom }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if profil.soft_skills.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Soft skills</p>
+                <div class="flex flex-wrap gap-2">
+                    {% for skill in profil.soft_skills.all %}
+                    <span class="bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full">{{ skill.nom }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <div class="md:col-span-2 space-y-6">
+
+            {% if profil.formations.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Formation</p>
+                {% for formation in profil.formations.all %}
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ formation.diplome }}</p>
+                        <p class="text-xs text-gray-500">{{ formation.etablissement }}{% if formation.annee %} · {{ formation.annee }}{% endif %}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if profil.experiences.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Expérience</p>
+                {% for exp in profil.experiences.all %}
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-8 h-8 bg-yellow-50 rounded-lg flex-shrink-0"></div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ exp.poste }}</p>
+                        <p class="text-xs text-gray-500">{{ exp.entreprise }}{% if exp.duree %} · {{ exp.duree }}{% endif %}</p>
+                        {% if exp.description %}
+                        <p class="text-xs text-gray-400 mt-1">{{ exp.description }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if profil.projets.all %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4">Projets</p>
+                {% for projet in profil.projets.all %}
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-900">{{ projet.nom }}</p>
+                    {% if projet.description %}
+                    <p class="text-xs text-gray-500 mt-1">{{ projet.description }}</p>
+                    {% endif %}
+                    {% if projet.technologies %}
+                    <p class="text-xs text-gray-400 mt-1">{{ projet.technologies }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}
