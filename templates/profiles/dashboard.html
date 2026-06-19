@@ -55,7 +55,7 @@
                     <a href="{% url 'profiles:upload_cv' %}" class="text-xs text-[#2D6A4F] font-medium hover:underline">
                         Mettre à jour mon CV →
                     </a>
-                    <a href="{% url 'profiles:public_profile' request.user.username %}" target="_blank" class="text-xs text-gray-500 font-medium hover:underline">
+                    <a href="{% url 'profiles:public_profile' profil.slug %}" target="_blank" class="text-xs text-gray-500 font-medium hover:underline">
                         Voir mon profil public →
                     </a>
                 </div>
