@@ -161,15 +161,17 @@ def upload_cv_view(request):
     return render(request, 'profiles/upload_cv.html', {'form': form})
 
 
-@login_required
-def public_profile_view(request, username):
+def public_profile_view(request, slug):
     """Vue profil public."""
     from django.shortcuts import get_object_or_404
-    from accounts.models import User
+    from .services.qr_generator import generer_qr_code_base64
 
-    utilisateur = get_object_or_404(User, username=username)
-    profil = get_object_or_404(Profil, utilisateur=utilisateur, est_public=True)
+    profil = get_object_or_404(Profil, slug=slug, est_public=True)
+
+    profil_url = request.build_absolute_uri()
+    qr_code_base64 = generer_qr_code_base64(profil_url)
 
     return render(request, 'profiles/public_profile.html', {
-        'profil': profil
+        'profil': profil,
+        'qr_code_base64': qr_code_base64
     })
