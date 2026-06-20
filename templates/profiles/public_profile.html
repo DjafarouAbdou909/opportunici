@@ -28,8 +28,8 @@
                 {% endif %}
             </div>
         </div>
-        {% if profil.qr_code %}
-        <img src="{{ profil.qr_code.url }}" alt="QR Code" class="w-20 h-20">
+        {% if qr_code_base64 %}
+        <img src="{{ qr_code_base64 }}" alt="QR Code" class="w-20 h-20">
         {% endif %}
     </div>
 

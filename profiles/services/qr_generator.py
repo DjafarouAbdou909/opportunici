@@ -1,17 +1,18 @@
 import qrcode
+import base64
 from io import BytesIO
-from django.core.files.base import ContentFile
 
 
-def generer_qr_code(url: str) -> ContentFile:
+def generer_qr_code_base64(url: str) -> str:
     """
-    Génère un QR code pointant vers l'URL du profil public.
+    Génère un QR code en base64, sans le stocker en fichier sur disque.
+    Utile en production où le stockage de fichiers n'est pas persistant.
 
     Args:
         url: URL complète du profil public
 
     Returns:
-        ContentFile contenant l'image PNG du QR code
+        Chaîne base64 prête à être utilisée dans un attribut src="data:image/png;base64,..."
     """
     qr = qrcode.QRCode(
         version=1,
@@ -26,6 +27,6 @@ def generer_qr_code(url: str) -> ContentFile:
 
     buffer = BytesIO()
     img.save(buffer, format='PNG')
-    buffer.seek(0)
+    img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
 
-    return ContentFile(buffer.read(), name='qrcode.png')
+    return f"data:image/png;base64,{img_base64}"
